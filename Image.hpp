@@ -11,13 +11,12 @@ class Image { //image template class
 	int width;
 	int height;
 	std::vector<Pixel<p>> data;
-
+	
 	static const int fileHeaderSize = 14;
-	static const int informationHeaderSize = 40;
-
+	int informationHeaderSize = 40;
 	uint8_t fileHeader[fileHeaderSize];
-	uint8_t informationHeader[informationHeaderSize];
-
+	std::vector<uint8_t> informationHeader;
+	
 	//note channels implied through PixelType p
 public:
 	Image(std::string path) {
@@ -32,6 +31,8 @@ public:
 
 		f.read(reinterpret_cast<char*>(fileHeader), fileHeaderSize);
 
+		informationHeader.resize(informationHeaderSize);
+
 		if (fileHeader[0] == 'B' && fileHeader[1] == 'M') {
 			BMPImageRead(f);
 		}
@@ -43,23 +44,28 @@ public:
 			std::cout << "file could not be opened" << std::endl;
 			return false;
 		}
-		
-		f.read(reinterpret_cast<char*>(informationHeader), informationHeaderSize);
+		int oldSize = informationHeaderSize;
+		f.read(reinterpret_cast<char*>(informationHeader.data()), informationHeaderSize);
+		informationHeaderSize = informationHeader[0];
+		informationHeader.resize(informationHeaderSize);
+		f.read(reinterpret_cast<char*>(informationHeader.data()+ oldSize), informationHeaderSize-oldSize);
 
 		//bit shift to get each byte of the int (which is fileSize) and then add then together - need to bit shift to get decimal places correct
 		int fileSize = fileHeader[2] + (fileHeader[3] << 8) + (fileHeader[4] << 16) + (fileHeader[5] << 24);
 		width = informationHeader[4] + (informationHeader[5] << 8) + (informationHeader[6] << 16) + (informationHeader[7] << 24);
 		height = informationHeader[8] + (informationHeader[9] << 8) + (informationHeader[10] << 16) + (informationHeader[11] << 24);
+		
+		std::cout << (int)informationHeader[0];
 
 		data.resize(width * height);
 
-		const int paddingAmount = (4 - (width * p) % 4) % 4; //recall p is number of channels
+		int paddingAmount = (4 - (width * p) % 4) % 4; //recall p is number of channels
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
 				uint8_t buffer[p];
 				f.read(reinterpret_cast<char*>(buffer), p); //read pixel data into buffer
 				for (int channel = 0; channel < p; channel++) { //put pixel data from buffer to data vector
-					data[y * height + x][channel] = buffer[channel]; //note colours are stored BGR
+					data[y * width + x][channel] = buffer[channel]; //note colours are stored BGR
 				}
 			}
 			f.ignore(paddingAmount);
@@ -68,9 +74,112 @@ public:
 		return true;
 	}
 
-	//bool BMPImageWrite
+	//creates a new file of the image
+	bool BMPImageWrite(std::string path) {
+		std::ofstream f;
+		f.open(path, std::ios::out | std::ios::binary);
+		if (!f.is_open()) {
+			std::cout << "file could not be opened/created" << std::endl;
+			return false;
+		}
 
-	Image(int width, int height, std::vector<Pixel<p>>& data) : width(width), height(height), data(data){}
+		uint8_t bmpPad[3] = { 0, 0, 0 };
+		const int paddingAmount = (4 - (width * p) % 4) % 4;
+
+		const int fileSize = fileHeaderSize + informationHeaderSize + width * height * p + paddingAmount * height;
+
+		//file type
+		fileHeader[0] = 'B';
+		fileHeader[1] = 'M';
+		//file size
+		fileHeader[2] = fileSize;
+		fileHeader[3] = fileSize >> 8;
+		fileHeader[4] = fileSize >> 16;
+		fileHeader[5] = fileSize >> 24;
+		//reserved
+		fileHeader[6] = 0;
+		fileHeader[7] = 0;
+		//reserved
+		fileHeader[8] = 0;
+		fileHeader[9] = 0;
+		//pixel data offset
+		fileHeader[10] = fileHeaderSize + informationHeaderSize;
+		fileHeader[11] = 0;
+		fileHeader[12] = 0;
+		fileHeader[13] = 0;
+
+		//header size
+		informationHeader[0] = informationHeaderSize;
+		informationHeader[1] = 0;
+		informationHeader[2] = 0;
+		informationHeader[3] = 0;
+		//image width
+		informationHeader[4] = width;
+		informationHeader[5] = width >> 8;
+		informationHeader[6] = width >> 16;
+		informationHeader[7] = width >> 24;
+		//image height
+		informationHeader[8] = height;
+		informationHeader[9] = height >> 8;
+		informationHeader[10] = height >> 16;
+		informationHeader[11] = height >> 24;
+		//Planes
+		informationHeader[12] = 1;
+		informationHeader[13] = 0;
+		//bits per pixel
+		informationHeader[14] = 24;
+		informationHeader[15] = 0;
+		//compression
+		informationHeader[16] = 0;
+		informationHeader[17] = 0;
+		informationHeader[18] = 0;
+		informationHeader[19] = 0;
+		//image size
+		informationHeader[20] = 0;
+		informationHeader[21] = 0;
+		informationHeader[22] = 0;
+		informationHeader[23] = 0;
+		//x pixels per meter
+		informationHeader[24] = 0;
+		informationHeader[25] = 0;
+		informationHeader[26] = 0;
+		informationHeader[27] = 0;
+		//y pixels per meter
+		informationHeader[28] = 0;
+		informationHeader[29] = 0;
+		informationHeader[30] = 0;
+		informationHeader[31] = 0;
+		//total colours
+		informationHeader[32] = 0;
+		informationHeader[33] = 0;
+		informationHeader[34] = 0;
+		informationHeader[35] = 0;
+		//important colours
+		informationHeader[36] = 0;
+		informationHeader[37] = 0;
+		informationHeader[38] = 0;
+		informationHeader[39] = 0;
+
+		f.write(reinterpret_cast<char*>(fileHeader), fileHeaderSize);
+		f.write(reinterpret_cast<char*>(informationHeader.data()), informationHeaderSize);
+
+		for (int y = 0; y < height; y++) {
+			for(int x = 0; x < width; x++) {
+				f.write(reinterpret_cast<char*>(this->getPixel(x, y).data), p);
+			}
+			f.write(reinterpret_cast<char*>(bmpPad), paddingAmount);
+		}
+		f.close();
+		std::cout << "file wrote to successfully" << std::endl;
+		return true;
+	}
+
+	Image(int width, int height, std::vector<Pixel<p>>& data) : width(width), height(height), data(data){
+		if (data.size() != width * height) {
+			throw std::runtime_error("width and height do not match data vector size");
+		}
+
+	}
 	//disable copying ands assignment bc expensive operation
 	Image(const Image&) = delete;
 	Image& operator=(Image&) = delete;
@@ -87,8 +196,13 @@ public:
 		}
 		return false;
 	}
-	//cannot modify pixel - returned by const reference
+	//cannot modify pixel
 	Pixel<p> getPixel(int x, int y) const {
+		return data[y * width + x];
+	}
+
+	//can modify pixel
+	Pixel<p>& getPixel(int x, int y) {
 		return data[y * width + x];
 	}
 
@@ -98,14 +212,8 @@ public:
 	int getHeight() {
 		return height;
 	}
-	//returns constant reference to data
+	//returns constant reference to image data
 	std::vector<Pixel<p>>& getData() const {
 		return data;
 	}
-
-
-	
-	
-
-	
 };

@@ -2,6 +2,7 @@
 #include "Image.hpp"
 #include "Pixel.hpp"
 #include <string.h>
+#include "ImageProcessing.hpp"
 
 int main() {
 	/*
@@ -45,12 +46,15 @@ int main() {
 	3. put data 
 	*/
 
-	std::string path = "bmp_24.bmp";
+	std::string path = "large.bmp";
 	Image<PixelType::BGR> im(path);
+	ImageProcessing::grayScale(im);
 
-	Pixel<BGR> p = im.getPixel(2, 199);
+	im.BMPImageWrite("large_g.bmp");
+	
+	
 
-	std::cout << (int)p[0] << ", " << (int)p[1] << ", " << (int)p[2] << std::endl;
+	
 
 
 	return 0;
