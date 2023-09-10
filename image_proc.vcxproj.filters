@@ -21,6 +21,9 @@
     <ClCompile Include="ImageProcessing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Point.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Pixel.hpp">
@@ -40,6 +43,9 @@
     </ClInclude>
     <ClInclude Include="ImageProcessing.hpp">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Point.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

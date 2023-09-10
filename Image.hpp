@@ -39,23 +39,37 @@ public:
 		f.close();
 		//do conditions for other file types
 	}
+
+	
+	Image(int width, int height, std::vector<Pixel<p>>& data, int informationHeaderSize=40) : width(width), height(height), data(data) {
+		if (data.size() != width * height) {
+			throw std::runtime_error("width and height do not match data vector size");
+		}
+		informationHeader.resize(informationHeaderSize);
+	}
+
 	bool BMPImageRead(std::ifstream& f) {
 		if (!f.is_open()) {
 			std::cout << "file could not be opened" << std::endl;
 			return false;
 		}
-		int oldSize = informationHeaderSize;
+
+		int defaultInfoHeaderSize = informationHeaderSize; //default is 40 (in class definition)
+
+		//read first 40 bytes of info header
 		f.read(reinterpret_cast<char*>(informationHeader.data()), informationHeaderSize);
 		informationHeaderSize = informationHeader[0];
+
+		//read remaining bytes in info header
 		informationHeader.resize(informationHeaderSize);
-		f.read(reinterpret_cast<char*>(informationHeader.data()+ oldSize), informationHeaderSize-oldSize);
+		f.read(reinterpret_cast<char*>(informationHeader.data() + sizeof(uint8_t) * defaultInfoHeaderSize), informationHeaderSize - defaultInfoHeaderSize);
 
 		//bit shift to get each byte of the int (which is fileSize) and then add then together - need to bit shift to get decimal places correct
 		int fileSize = fileHeader[2] + (fileHeader[3] << 8) + (fileHeader[4] << 16) + (fileHeader[5] << 24);
 		width = informationHeader[4] + (informationHeader[5] << 8) + (informationHeader[6] << 16) + (informationHeader[7] << 24);
 		height = informationHeader[8] + (informationHeader[9] << 8) + (informationHeader[10] << 16) + (informationHeader[11] << 24);
 		
-		std::cout << (int)informationHeader[0];
+		std::cout << "Info header size is " << (int)informationHeader[0] << " bytes" << std::endl;;
 
 		data.resize(width * height);
 
@@ -76,14 +90,14 @@ public:
 
 	//creates a new file of the image
 	bool BMPImageWrite(std::string path) {
-		std::ofstream f;
+		std::ofstream f;		
 		f.open(path, std::ios::out | std::ios::binary);
 		if (!f.is_open()) {
 			std::cout << "file could not be opened/created" << std::endl;
 			return false;
 		}
 
-		uint8_t bmpPad[3] = { 0, 0, 0 };
+		uint8_t bmpPad[3] = {0, 0, 0};
 		const int paddingAmount = (4 - (width * p) % 4) % 4;
 
 		const int fileSize = fileHeaderSize + informationHeaderSize + width * height * p + paddingAmount * height;
@@ -127,7 +141,7 @@ public:
 		informationHeader[12] = 1;
 		informationHeader[13] = 0;
 		//bits per pixel
-		informationHeader[14] = 24;
+		informationHeader[14] = 8*p;
 		informationHeader[15] = 0;
 		//compression
 		informationHeader[16] = 0;
@@ -160,12 +174,20 @@ public:
 		informationHeader[38] = 0;
 		informationHeader[39] = 0;
 
+		//remaining informationHeader values over index 39 are default set to zero when informationHeader array is resized over 40
+
 		f.write(reinterpret_cast<char*>(fileHeader), fileHeaderSize);
 		f.write(reinterpret_cast<char*>(informationHeader.data()), informationHeaderSize);
 
 		for (int y = 0; y < height; y++) {
 			for(int x = 0; x < width; x++) {
-				f.write(reinterpret_cast<char*>(this->getPixel(x, y).data), p);
+				//need to transfer into uint8_t container bc pixel stores channels as ints, so it can do operations;
+				uint8_t tempData[p];
+				int* dataArr = this->getPixel(x, y).data;
+				for (int i = 0; i < p; i++) {
+					tempData[i] = dataArr[i];
+				}
+				f.write(reinterpret_cast<char*>(tempData), p);
 			}
 			f.write(reinterpret_cast<char*>(bmpPad), paddingAmount);
 		}
@@ -174,13 +196,8 @@ public:
 		return true;
 	}
 
-	Image(int width, int height, std::vector<Pixel<p>>& data) : width(width), height(height), data(data){
-		if (data.size() != width * height) {
-			throw std::runtime_error("width and height do not match data vector size");
-		}
-
-	}
-	//disable copying ands assignment bc expensive operation
+	
+	//disable copying and assignment bc expensive operation
 	Image(const Image&) = delete;
 	Image& operator=(Image&) = delete;
 	//x and y are zero indexed
@@ -201,19 +218,25 @@ public:
 		return data[y * width + x];
 	}
 
-	//can modify pixel
+	//can modify pixel (returns ref)
 	Pixel<p>& getPixel(int x, int y) {
 		return data[y * width + x];
 	}
 
-	int getWidth() {
+	int getWidth() const {
 		return width;
 	}
-	int getHeight() {
+	int getHeight() const {
 		return height;
 	}
-	//returns constant reference to image data
-	std::vector<Pixel<p>>& getData() const {
+	//returns constant image pixel data - need in order to use copy of image data to process images whose kernel depends on surroundings pixels
+	//this is the only time that we "copy" an image - dont want to copy image in most cases
+	std::vector<Pixel<p>> getData() const {
 		return data;
 	}
+
+	//want to modify image, or make new image during image processing? if modify image, must allow copying of data, but if making new image dont need to make copy, and can return with std::move - making new image
+	//basically just as expensive, but is good bc we can completely eliminate posibility of copying
+	//BUTTTT if we use modify image, even tho copying will be possible, copy of data is local to the processing function do it will be destroyed at end of function anyway
+	//also makes more sense to keep modifying one image, as opposed to making 10 new images if we process image 10 times.
 };

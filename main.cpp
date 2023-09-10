@@ -7,16 +7,16 @@
 int main() {
 	/*
 	std::vector<Pixel<BGR>> data;
-	Pixel<PixelType::BGR> p1({ 1, 2, 3 });
-	Pixel<PixelType::BGR> p2({ 4, 5, 6 });
+	Pixel<PixelType::BGR> p1({ 0, 0, 0 });
+	Pixel<PixelType::BGR> p2({ 255, 255, 255 });
 	Pixel<PixelType::BGR> p3({ 7, 8, 9 });
 
-	Pixel<PixelType::BGR> p4({ 10, 11, 12 });
-	Pixel<PixelType::BGR> p5({ 13, 14, 15 });
-	Pixel<PixelType::BGR> p6({ 16, 17, 18 });
+	Pixel<PixelType::BGR> p4({ 0, 255, 0 });
+	Pixel<PixelType::BGR> p5({ 255, 255, 255 });
+	Pixel<PixelType::BGR> p6({ 255, 0, 0 });
 
 	Pixel<PixelType::BGR> p7({ 19, 20, 21 });
-	Pixel<PixelType::BGR> p8({ 22, 23, 24 });
+	Pixel<PixelType::BGR> p8({ 255, 255, 255 });
 	Pixel<PixelType::BGR> p9({ 25, 26, 27 });
 
 	data.push_back(p1);
@@ -31,13 +31,6 @@ int main() {
 
 
 	Image<PixelType::BGR> im(3, 3, data);
-	Pixel<PixelType::BGR> pix = im.getPixel(0, 2);
-	std::cout << (int)pix[1] << std::endl;
-
-	Pixel<PixelType::BGR> pix2({ 1, 2, 3 });
-
-	im.setPixel(2, 2, pix2);
-	std::cout << (int)data[8][1];
 	*/
 
 	/*
@@ -46,16 +39,37 @@ int main() {
 	3. put data 
 	*/
 
-	std::string path = "large.bmp";
-	Image<PixelType::BGR> im(path);
-	ImageProcessing::grayScale(im);
+	std::string path = "blackbuck.bmp";
+	std::string path2 = "LUG2.bmp";
+	std::string path3 = "field.bmp";
 
-	im.BMPImageWrite("large_g.bmp");
-	
-	
+	//Image<BGR> im(path);
+	Image<BGR> im2(path2);
+	//Image<BGR> im3(path3);
 
-	
+	//std::unique_ptr<Image<PixelType::Grayscale>> imG = ImageProcessing::grayScale1(im);
+	//ImageProcessing::grayScale3(im);
+	//std::vector<Pixel<PixelType::BGR>> copy = im.getData();
+	//ImageProcessing::Convolution(im, ImageProcessing::EdgeDetectionKernel);
+	//ImageProcessing::EdgeDetection(im, 40);
+	ImageProcessing::EdgeDetection(im2, 40);
+	//ImageProcessing::EdgeDetection(im3, 40);
 
+	/*
+	std::vector<std::vector<double>> kernel = { {1/2.0, 0, 0} };
+	Point centerG(1, 1);
+	Point centerK(1, 0);
+	Point dims(3, 3);
+	std::vector<Pixel<BGR>> tempData = im.getData();
+	im.setPixel(1, 1, ImageProcessing::ApplyKernel(kernel, centerK, centerG, dims, tempData));
+	*/
+
+	//im.setPixel(1, 1, im.getPixel(1, 1).scale(0.1));
+	//im.BMPImageWrite("blackbuck_edgesFinal.bmp");
+	im2.BMPImageWrite("LUG2_edgesFinal.bmp");
+	//im3.BMPImageWrite("field_edgesFinal.bmp");
+
+	//imG->BMPImageWrite("large_g.bmp");
 
 	return 0;
 }
