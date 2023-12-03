@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <stdint.h>
+#include <stdexcept>
 
 enum PixelType { //type corresponds to num of channels
 	BGR = 3,
@@ -26,13 +27,13 @@ struct Pixel {
 		}
 	}
 
-	int r() const {
+	inline int r() const {
 		return data[2];
 	}
-	int g() const {
+	inline int g() const {
 		return data[1];
 	}
-	int b() const {
+	inline int b() const {
 		return data[0];
 	}
 	
@@ -94,6 +95,10 @@ struct Pixel {
 
 	void operator+=(const Pixel<p>& pix) {
 		(*this) = (*this) + pix;
+	}
+
+	double average() {
+		return (data[0] + data[1] + data[2]) / 3.0;
 	}
 
 

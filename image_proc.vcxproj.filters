@@ -41,10 +41,13 @@
     <ClInclude Include="Image.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ImageProcessing.hpp">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="Point.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ImageProcessing.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Graph.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

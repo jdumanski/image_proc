@@ -1,5 +1,7 @@
 #pragma once
 #include <opencv2/opencv.hpp>
+#include <opencv2/opencv_modules.hpp>
+#include <opencv2/core.hpp>
 #include "Pixel.hpp"
 #include <string.h>
 #include <stdint.h>
@@ -198,7 +200,7 @@ public:
 
 	
 	//disable copying and assignment bc expensive operation
-	Image(const Image&) = delete;
+	//Image(const Image&) = delete;
 	Image& operator=(Image&) = delete;
 	//x and y are zero indexed
 	
@@ -207,6 +209,9 @@ public:
 		if (x < width && y < height) {
 			int startIdx = y * width + x;
 			for (int i = 0; i < p; i++) {
+				if (val[i] > 255) {
+					val[i] = 255;
+				}
 				data[startIdx][i] = val[i];
 			}
 			return true;
@@ -223,10 +228,10 @@ public:
 		return data[y * width + x];
 	}
 
-	int getWidth() const {
+	inline int getWidth() const {
 		return width;
 	}
-	int getHeight() const {
+	inline int getHeight() const {
 		return height;
 	}
 	//returns constant image pixel data - need in order to use copy of image data to process images whose kernel depends on surroundings pixels

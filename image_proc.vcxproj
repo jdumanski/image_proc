@@ -90,7 +90,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\hocke\OneDrive\Non_School_Coding\project_thing\project_thing\includes\eigen</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\hocke\OneDrive\Non_School_Coding\Includes\Eigen;C:\Users\hocke\OneDrive\Non_School_Coding\Includes\opencv\sources\include;C:\Users\hocke\OneDrive\Non_School_Coding\Includes\opencv\build\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -107,6 +107,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Users\hocke\OneDrive\Non_School_Coding\Includes\Eigen;C:\Users\hocke\OneDrive\Non_School_Coding\Includes\opencv\sources\include;C:\Users\hocke\OneDrive\Non_School_Coding\Includes\opencv\build\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -149,6 +150,7 @@
     <ClCompile Include="Point.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Graph.hpp" />
     <ClInclude Include="Image.hpp" />
     <ClInclude Include="ImageProcessing.hpp" />
     <ClInclude Include="jpeg.hpp" />
