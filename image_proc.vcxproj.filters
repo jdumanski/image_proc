@@ -24,15 +24,15 @@
     <ClCompile Include="Point.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Kernel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Pixel.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="png.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="jpeg.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Bitmap.hpp">
@@ -48,6 +48,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Graph.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Kernel.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

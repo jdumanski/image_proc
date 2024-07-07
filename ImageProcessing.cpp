@@ -85,11 +85,13 @@ Image<Grayscale> ImageProcessing::BGR24ToGrayscale8(const Image<BGR>& im) {
 	 }
  }
 
- void ImageProcessing::EdgeDetectionSobel(Image<BGR>& im, int thresh) {
+
+
+ void ImageProcessing::EdgeDetectionSobel(Image<BGR>& im, int thresh, bool fourier=false) {
 	 Pixel<BGR> whitePix({ 255, 255, 255 });
 	 Pixel<BGR> blackPix({ 0, 0, 0 });
 	 Point dims(im.getWidth(), im.getHeight());
-	 std::vector<Pixel<BGR>> dataCopy = im.getData();
+	 std::vector<Pixel<BGR>> dataCopy = im.getData(); //why make copy? just get reference to it
 	 Point centerK(1, 1);
 
 	 for (int y = 0; y < dims.y; y++) {
@@ -113,10 +115,11 @@ Image<Grayscale> ImageProcessing::BGR24ToGrayscale8(const Image<BGR>& im) {
  }
 
  //kernel dim must be odd - if even we make it odd
- void ImageProcessing::GaussianBlur3(Image<BGR>& im) {
+ void ImageProcessing::GaussianBlur3(Image<BGR>& im, bool inPlace) {
 	 Point dims(im.getWidth(), im.getHeight());
 	 std::vector<Pixel<BGR>> dataCopy = im.getData();
 	 Point centerK(1, 1);
+	 convolution(GAUSSBLUR3)
 	 for (int y = 0; y < dims.y; y++) {
 		 for (int x = 0; x < dims.x; x++) {
 			 Point centerG(x, y);
@@ -166,10 +169,11 @@ Image<Grayscale> ImageProcessing::BGR24ToGrayscale8(const Image<BGR>& im) {
  //for kernel inside vectors are rows
  //k is for kernel space, g is for global space
  //kernelSize isthe 
- Pixel<BGR> ImageProcessing::ApplyKernel(const std::vector<std::vector<double>>& kernel, Point centerK, Point centerG, Point dims, const std::vector<Pixel<BGR>>& imData) {
+ Pixel<BGR> ImageProcessing::ApplyKernel(const Kernel & kernel, Point centerG, Point dims, const std::vector<Pixel<BGR>>& imData) {
 	 int kernelWidth = kernel[0].size();
 	 int kernelHeight = kernel.size();
-	 Point transform = centerG - centerK;
+	 Point centerK(kernel.getSize());
+	 Point transform = centerG - centerK; //location of (0, 0) in kernel space, in global space
 	 Pixel<BGR> convSum({ 0, 0, 0 });
 	 std::vector<Point> skippedIndices;
 	 for (int xk = 0; xk < kernelWidth; xk++) {
@@ -187,7 +191,7 @@ Image<Grayscale> ImageProcessing::BGR24ToGrayscale8(const Image<BGR>& im) {
 	 }
 	 return convSum;
  }
-
+ 
  //calculares partial derivative of a pixel wrt x by summing partial derivatives of r, g, and b channels wrt x
  double ImageProcessing::partialX(const std::vector<Pixel<BGR>>& data, Point currPoint, Point dims) {
 	 if (currPoint.x < 2) {
@@ -209,7 +213,7 @@ Image<Grayscale> ImageProcessing::BGR24ToGrayscale8(const Image<BGR>& im) {
 	 }
 	 return centeredDiff(data, currPoint, dims, 0);
  }
-
+ 
  //calculates centered difference derivative of r, g, and b streams, and returns the magnitude of these
  //idx to index of pixel to calcualte derivative about
  //dataIncrement is the number of vector indices between adjacent function values (image pixels) used in the numerical calculation - 1 for x and width for y, since moving in the x direction is 
@@ -338,21 +342,18 @@ Image<Grayscale> ImageProcessing::BGR24ToGrayscale8(const Image<BGR>& im) {
 
  //cant export single channel bmp from 3 chan - fix later
 
-
- void ImageProcessing::Convolution(Image<BGR>& im, std::function<Pixel<BGR>(Point, Point, const std::vector<Pixel<BGR>>&)> kernel) {
+ /*
+ void ImageProcessing::Convolution(Image<BGR>& im, const std::vector<std::vector<double>> & kernel) {
 	 Point dims(im.getWidth(), im.getHeight());
 	 std::vector<Pixel<BGR>> dataCopy = im.getData();
 	 for (int y = 0; y < dims.y; y++) {
 		 for (int x = 0; x < dims.x; x++) {
 			 Point currPoint(x, y);
-			 im.setPixel(x, y, kernel(currPoint, dims, dataCopy));
-		 }
-		 if (y == 510) {
-			 std::cout << y << std::endl;
+			 im.setPixel(x, y, ApplyKernel());
 		 }
 	 }
  }
-
+ */
  Pixel<BGR> ImageProcessing::EdgeDetectionKernel(Point currPoint, Point dims, const std::vector<Pixel<BGR>>& imData) {
 	 double pX = partialX(imData, currPoint, dims);
 	 double pY = partialY(imData, currPoint, dims);

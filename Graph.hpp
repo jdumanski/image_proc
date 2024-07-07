@@ -17,7 +17,7 @@ public:
 	//inserts 1 or 2 edges based on if directed or not
 	//for directed, inserts edges from n1 to n2
 	//assumes n1 and n2 in graph - if not that on YOU, don't be dumb
-	bool InsertEdge(int n1, int n2, double weight=1) {
+	bool insertEdge(int n1, int n2, double weight=1) {
 		adjacencyList[n1].push_back(n2);
 		if (weighted) {
 			weights[std::make_pair(n1, n2)] = weight;
@@ -29,13 +29,13 @@ public:
 			}
 		}
 	}
-	bool InsertNode(T nodeData) {
+	bool insertNode(T nodeData) {
 		data[numNodes++] = nodeData; 
 		//dont need to do anything with adjacencyList bc all vectors in list are initialized to empty list
 	}
 	//VERY expensive so try not to use
 	//why r u removing nodes anyway, just dont put them in in the first place
-	bool RemoveNode(int node) {
+	bool removeNode(int node) {
 		data.erase(node);
 		//remove all edge weights from node to delete to its neighbours
 		for (int neighbour : adjacencyList[node]) {
@@ -54,7 +54,7 @@ public:
 		}
 		return true;
 	}
-	bool RemoveEdge(int n1, int n2) {
+	bool removeEdge(int n1, int n2) {
 		weights.erase(std::make_pair(n1, n2));
 		adjacencyList[n1].erase(std::remove(adjacencyList[n1].begin(), adjacencyList[n1].end(), n2), adjacencyList[n1].end());
 		if (!directed) {
@@ -68,7 +68,9 @@ public:
 	}
 	
 	//implement A* later if you ever need this
-	std::vector<int> ShortestPath();
+	std::vector<int> shortestPath() {
+		return;
+	}
 
 	int getWeight(int n1, int n2) const {
 		if (!weighted) 
@@ -76,7 +78,7 @@ public:
 		return weights[std::make_pair(n1, n2)];
 	}
 
-	bool EdgeExists(int n1, int n2) const {
+	bool edgeExists(int n1, int n2) const {
 		if (std::find(adjacencyList[n1].begin(), adjacencyList[n1].end(), n2) != adjacencyList[n1].end())
 			return true;
 		return false;

@@ -43,8 +43,9 @@ public:
 	}
 
 	
-	Image(int width, int height, std::vector<Pixel<p>>& data, int informationHeaderSize=40) : width(width), height(height), data(data) {
+	Image(int width, int height, std::vector<Pixel<p>>& data, int informationHeaderSize=40) : width(width), height(height), data(data), informationHeaderSize(informationHeaderSize) {
 		if (data.size() != width * height) {
+			std::cout << "ye" << std::endl;
 			throw std::runtime_error("width and height do not match data vector size");
 		}
 		informationHeader.resize(informationHeaderSize);

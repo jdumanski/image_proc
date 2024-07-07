@@ -13,10 +13,15 @@ enum PixelType { //type corresponds to num of channels
 template <PixelType p>
 struct Pixel {
 	//by convention, indices 0, 1, and 2 are BGR
-	int data[p]; //private so it cant be accessed if image in const ref
+	int data[p];
 
-	Pixel() {}
-	Pixel(std::initializer_list<uint8_t> _data){
+	Pixel()
+	{
+		std::fill(data, data + p, 0);
+	}
+
+	Pixel(std::initializer_list<uint8_t> _data)
+	{
 		int iters = 0;
 		for (auto it = _data.begin(); it != _data.end(); it++) {
 			if (iters >= p) {
