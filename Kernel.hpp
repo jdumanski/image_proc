@@ -12,7 +12,7 @@ class Kernel {
 	std::vector<double> weights;
 public:
 	Kernel(std::initializer_list<double> values);
-	double setWeight(int x, int y, double val);
+	void setWeight(int x, int y, double val);
 	double getWeight(int x, int y) const;
 	int getSize() const;
 	/*

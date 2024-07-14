@@ -4,15 +4,25 @@
 #include <string.h>
 #include "ImageProcessing.hpp"
 #include "Kernel.hpp"
+#include "Bitmap.hpp"
 
 // TODO
 // refactor current code before moving on to freq domain stuff
 
 int main(){
+	BitmapReader reader;	
+	std::cout << "Reading..." << std::endl;
+	std::unique_ptr<Image<BGR>> img = nullptr;
+	reader.readBMP<BGR>("IMAGES/blackbuck.bmp", img);
 
-	Kernel k = { 1, 2, 3, 4 };
+	BitmapWriter writer;
+	std::cout << "Writing..." << std::endl;
+	writer.writeBMP<BGR>("IMAGES/blackbuck_copy.bmp", *img);
+	return 0;
 
-	std::cout << k.getWeight(1, 1);
+	//Kernel k = { 1, 2, 3, 4 };
+
+	//std::cout << k.getWeight(1, 1);
 
 	/*
 	1. create bitmap object

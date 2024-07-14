@@ -15,7 +15,7 @@ double Kernel::getWeight(int x, int y) const {
 	return weights[y * dim + x];
 }
 
-double Kernel::setWeight(int x, int y, double val) {
+void Kernel::setWeight(int x, int y, double val) {
 	int dim = sqrt(weights.size());
 	weights[y * dim + x] = val;
 }

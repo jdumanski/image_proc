@@ -13,6 +13,7 @@
 
 */
 
+/*
 //converts rbg image to 3 channel grayscale image
 void ImageProcessing::BGR24ToGrayscale24(Image<BGR>& im) {
 	for (int y = 0; y < im.getHeight(); y++) {
@@ -22,7 +23,6 @@ void ImageProcessing::BGR24ToGrayscale24(Image<BGR>& im) {
 			Pixel<BGR> grayPix({ grayVal, grayVal, grayVal });
 			im.setPixel(x, y, grayPix);
 		}
-		//std::cout << "done row " << y << std::endl;
 	}
 }
 
@@ -53,7 +53,7 @@ Image<Grayscale> ImageProcessing::BGR24ToGrayscale8(const Image<BGR>& im) {
 	}
 	Image<Grayscale> imGray(im.getWidth(), im.getHeight(), grayData);
 	return imGray; // dont need std::move because most complilers make lvalues eligible for NRVO (named (lvalue) returned value optimization), ie compiler
-	//will do move for you, and that move is more efficient than std::move
+	// will do move for you, and that move is more efficient than std::move
 }
 
 //simple edge detection using derivatives?
@@ -160,7 +160,7 @@ Image<Grayscale> ImageProcessing::BGR24ToGrayscale8(const Image<BGR>& im) {
 		 }
 	 }
  }
-
+ 
 
 
  //centerK is coordiante of center in kernel space (reference frame of the kernel) - its zero indexed
@@ -191,7 +191,7 @@ Image<Grayscale> ImageProcessing::BGR24ToGrayscale8(const Image<BGR>& im) {
 	 }
 	 return convSum;
  }
- 
+ */
  //calculares partial derivative of a pixel wrt x by summing partial derivatives of r, g, and b channels wrt x
  double ImageProcessing::partialX(const std::vector<Pixel<BGR>>& data, Point currPoint, Point dims) {
 	 if (currPoint.x < 2) {
